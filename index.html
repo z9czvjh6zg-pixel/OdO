@@ -74,18 +74,40 @@ LV.push(
 ['X',87,0],['X',91,0],['C',88,6,3,1],['o',95,9],['G',98,9]]}
 );
 const TC=LV.reduce((a,l)=>a+l.d.filter(o=>o[0]==='C').reduce((b,o)=>b+(o[3]||1)*(o[4]||1),0),0);
+LV.push({n:"11. Levi's Trial",w:98,h:12,p:[2,9],lev:1,rain:1,th:['#00140a','#022b14','#04200e','#00e060'],t:'Almost impossible. Almost.',d:[
+['#',0,10,8,2],['e',10,9],['n',13,9],['e',16,9],['n',19,9],
+['#',22,10,16,2],['f',23,9],['z',25,0,1,10],['z',27,0,1,10],['z',29,0,1,10],['z',31,0,1,10],['^',34,9,2],
+['t',36,7],['m',41,8],['m',50,8],['#',60,7,6,5],['f',61,6],
+['#',66,10,32,2],['X',68,0],['X',72,0],['o',70,9],['r',78,6],['q',84,8],['r',90,6],['G',96,9]]});
+LV.push({n:'12. Inversion',w:180,h:12,p:[2,9],th:['#10002a','#3a0a5a','#1a1030','#b050ff'],t:'Purple blocks flip gravity. Conveyors lie. Nothing here forgives.',d:[
+['#',0,10,15,2],['f',12,9],
+['F',15,2,1,10],['#',14,0,31,2],['V',22,2],['V',26,2,2],['V',31,2],['V',34,2,2],['F',41,2,1,8],['T',45,2],
+['#',40,10,14,2],['f',50,9],
+['<',54,10,13,1],['o',58,9],['^',60,9,2],['o',63,9],['#',67,10,5,2],['f',69,9],
+['e',74,9],['n',77,9],['e',80,9],['n',83,9],['e',86,9],['n',89,9],['v',79,6],['z',84,0,1,10],['v',88,6],
+['#',92,10,10,2],['f',93,9],
+['#',102,10,29,2],['z',105,0,1,10],['z',107,0,1,10],['z',109,0,1,10],['f',112,9],['X',115,0],['^',117,9],['X',119,0],['^',122,9,2],
+['#',125,0,6,9],['b',125,9,6,1],
+['#',131,10,50,2],['#',131,0,50,2],['f',133,9],
+['F',135,2,1,8],['q',137,5],['V',143,2,2],['F',147,2,1,8],['r',150,5],['f',154,9],['^',156,9,2],
+['F',159,2,1,8],['q',161,5],['V',166,2,2],['F',170,2,1,8],['f',173,9],['G',176,9]]});
+LV.push({n:'13. Oblivion',w:224,h:12,p:[2,9],th:['#1a0000','#4a0a0a','#240808','#ff2a2a'],t:'No one has finished this. Probably.',d:[
+['#',0,10,10,2],['>',10,10,9,1],['z',23,0,1,10],['#',26,10,8,2],['f',28,9],['^',31,9,2],
+['I',34,10,30,2],['^',38,9],['q',41,5],['^',44,9,2],['f',47,9],['o',52,9],['^',54,9],['o',57,9],['f',61,9],
+['#',64,10,45,2],['#',64,0,40,2],['f',64,9],
+['F',66,2,1,8],['z',70,2,1,8],['V',74,2,2],['F',78,2,1,8],['f',83,9],['^',85,9,2],['z',89,2,1,8],['F',92,2,1,8],['V',96,2,2],['z',99,2,1,8],['F',102,2,1,8],['f',107,9],
+['m',115,9],['y',124,8],['m',133,9],['r',119,3],['r',131,3],['o',127,7],['T',147,7],
+['#',137,10,12,2],['f',138,9],
+['#',149,10,37,2],['z',152,0,1,10],['z',154,0,1,10],['z',156,0,1,10],['f',158,9],['X',160,0],['^',162,9],['X',164,0],['^',166,9],['X',168,0],
+['#',171,0,8,9],['b',171,9,8,1],['f',181,9],
+['<',186,10,20,1],['o',190,9],['^',193,9],['o',196,9],['q',194,5],['^',199,9],['o',202,9],['f',204,9],
+['#',206,10,18,2],['#',206,0,16,2],['f',207,9],['F',210,2,1,8],['V',215,2,2],['G',219,2]]});
+const LI=10;
 const NL=LV.length;
 /* secret torture room: a sealed box, spikes close in from the walls and ceiling */
 LV.push({n:'Torture Room',w:20,h:12,p:[9.5,9],tor:1,th:['#2a0a12','#5a0a1a','#1a0a10','#6a2a3a'],t:'There is no exit. Tell it how you feel.',d:[
 ['#',0,10,20,2],['#',0,0,1,12],['#',19,0,1,12],['#',0,0,20,1]]});
 const TI=LV.length-1;
-/* LEVI'S TRIAL: secret, entered only with the cheat code. Blink bridge, antiphase lasers, moving platforms under turret fire, crushers + saws, fire bars. */
-LV.push({n:"Levi's Trial",w:98,h:12,p:[2,9],lev:1,rain:1,th:['#00140a','#022b14','#04200e','#00e060'],t:'Almost impossible. Almost.',d:[
-['#',0,10,8,2],['e',10,9],['n',13,9],['e',16,9],['n',19,9],
-['#',22,10,16,2],['f',23,9],['z',25,0,1,10],['z',27,0,1,10],['z',29,0,1,10],['z',31,0,1,10],['^',34,9,2],
-['t',36,7],['m',41,8],['m',50,8],['#',60,7,6,5],['f',61,6],
-['#',66,10,32,2],['X',68,0],['X',72,0],['o',70,9],['r',78,6],['q',84,8],['r',90,6],['G',96,9]]});
-const LI=LV.length-1;
 let tb='',torEsc=0,ban='',banT=0;
 let sd=null,autoT=15,saveMsg='',saveT=0;try{sd=JSON.parse(localStorage.getItem('sr2_save'))}catch(e){}
 
@@ -280,24 +302,9 @@ function seqCheck(e){
   seqBuf.push(e.code);if(seqBuf.length>8)seqBuf.shift();
   if(seqBuf.length===8&&seqBuf.every((k,i)=>k===SEQ[i%4])){seqBuf=[];cheatList=true;try{localStorage.setItem('sr2_cl','1')}catch(_){}note('Cheat list unlocked: Pause > Options')}
 }
-/* secret: press D 3 times on the home menu to warp to the start of level 7 (keeps your saved progress) */
-let dTaps=0,dT=0,dtTaps=0,dtT=0;
-function warp7(){
-  const keep=saved;A={d:1,a:0,p:0};deaths=0;total=0;cheatOpen=false;state='play';
-  load(6);saved=keep;sv();note('Secret warp: Level 7!');
-}
-function dWarpCheck(e){
-  if(state!=='menu'||optOpen||cheatOpen||e.repeat||e.ctrlKey||e.metaKey)return false;
-  if(/^(Shift|Control|Alt|Meta|CapsLock)/.test(e.key||'')||/^(Shift|Control|Alt|Meta|CapsLock)/.test(e.code||''))return false;   /* modifiers don't break the combo */
-  const isD=e.code==='KeyD'||(e.key&&e.key.toLowerCase()==='d');
-  if(!isD){dTaps=0;return false}
-  const t=performance.now();dTaps=(t-dT>2500)?1:dTaps+1;dT=t;
-  if(dTaps>=3){dTaps=0;e.preventDefault();warp7();return true}
-  return false}
 addEventListener('keydown',e=>{
   if(codeBox)return;
   seqCheck(e);
-  if(dWarpCheck(e))return;
   if((e.ctrlKey||e.metaKey)&&e.code==='KeyS'&&(state==='play'||state==='pause')){e.preventDefault();if(!e.repeat)saveGame('manual');return}
   if(menuKey(e))return;
   if(state==='result'||state==='lb'){uiKey(e);return}
@@ -374,8 +381,6 @@ function restartCP(){
   boom(p.x+11,p.y+14,'#44ddff',18,200);
   load(lv,1);note(cp?'Back to checkpoint':'Level restarted');
 }
-/* secret: tap the first O of the OdO title 3 times to warp to the last level (keeps your saved progress) */
-let oTaps=0,oT=0;
 /* cheat codes: tiny text in the bottom-left of the home menu */
 function runCheat(s){
   const c=s.trim().toLowerCase().replace(/\s+/g,' ');
@@ -413,10 +418,6 @@ function drawDunce(x,y){
   ctx.fillStyle='#f4e9b8';ctx.fill();ctx.clip();ctx.fillStyle='#d94a4a';ctx.fillRect(x,y-3,22,4);ctx.restore();
   ctx.font='bold 8px system-ui,sans-serif';ctx.textAlign='center';ctx.fillStyle='#c0392b';ctx.fillText('D',x+11,y-8);
 }
-function warp(){
-  const keep=saved;A={d:1,a:0,p:0};deaths=0;total=0;state='play';
-  load(NL-1);saved=keep;sv();note('Secret warp: last level!');
-}
 function menuTap(e){
   if(cheatView){cheatView=false;return}
   const x=(e.clientX-ox)/S,y=(e.clientY-oy)/S,n=optOpen?optN():mItems().length;
@@ -430,20 +431,6 @@ function menuTap(e){
     if(cheatOpen)cheatOpen=false;
   }
   if(state==='menu'&&!optOpen&&y<150)burst(x,y);
-  if(state==='menu'&&!optOpen){
-    const b=lb[0];
-    if(b&&x>=b[0]&&x<=b[1]&&y>=55&&y<=140){
-      const t=performance.now();oTaps=(t-oT>1500)?1:oTaps+1;oT=t;
-      burst((b[0]+b[1])/2,95);
-      if(oTaps>=3){oTaps=0;warp();return}
-    }else if(y>=55&&y<=140)oTaps=0;
-    const dd=lb[1];   /* tap the little d in the OdO title 3 times: warp to level 7 (same as pressing D 3 times) */
-    if(dd&&x>=dd[0]&&x<=dd[1]&&y>=55&&y<=140){
-      const t=performance.now();dtTaps=(t-dtT>1500)?1:dtTaps+1;dtT=t;
-      burst((dd[0]+dd[1])/2,95);
-      if(dtTaps>=3){dtTaps=0;warp7();return}
-    }else if(y>=55&&y<=140)dtTaps=0;
-  }
   for(let i=0;i<n;i++){const r=bR(i);if(x>=r[0]&&x<=r[0]+r[2]&&y>=r[1]&&y<=r[1]+r[3]){mi=i;pick(i);return}}
 }
 function vt(){ctx.setTransform(dpr*S,0,0,dpr*S,dpr*ox,dpr*oy)}
@@ -826,7 +813,7 @@ function leviWin(){const first=!sk.mx;sk.mx=1;sk.own[24]=1;sk.eq=24;sv();state='
    LB_URL: optional online leaderboard. Leave '' for local records only. If set, the game
    POSTs {level,name,time} JSON to it and GETs LB_URL?level=N expecting [{name,time},...] (fastest first). */
 const LB_URL='';
-const PAR=[16,18,20,19,22,22,19,17,26,32],TITLES=['Rookie','Runner','Sprinter','Dasher','Speedster','Rocket','Phantom','Blitz','Legend','Mythic','Apex'];
+const PAR=[16,18,20,19,22,22,19,17,26,32,45,70,100],TITLES=['Rookie','Runner','Sprinter','Dasher','Speedster','Rocket','Phantom','Blitz','Legend','Mythic','Apex'];
 let P={xp:0,name:'',pb:{},cl:{},lb:{}},lrt=0,runOK=true,pendNext=-1,res=null,lbL=0,lbFrom='menu',WL={};
 try{const q=JSON.parse(localStorage.getItem('sr2_prog'));if(q)P=Object.assign(P,q)}catch(e){}
 const psv=()=>{try{localStorage.setItem('sr2_prog',JSON.stringify(P))}catch(e){}};
@@ -837,7 +824,7 @@ function net(L,t){if(!LB_URL)return;try{fetch(LB_URL,{method:'POST',headers:{'Co
 function netGet(L){if(!LB_URL)return;fetch(LB_URL+'?level='+L).then(r=>r.json()).then(j=>{WL[L]=(j||[]).slice(0,10).map(e=>({n:String(e.name||e.n||'?').slice(0,12),t:+(e.time||e.t)}))}).catch(()=>{WL[L]=null})}
 function rename(){let v=null;try{v=prompt('Leaderboard name (max 12 chars)',P.name||'PLAYER')}catch(e){}if(v){P.name=(v+'').trim().slice(0,12)||'PLAYER';psv()}}
 function finishLevel(){
-  if(LV[lv].lev){leviWin();return}
+  if(LV[lv].lev){const first=!sk.mx;sk.mx=1;sk.own[24]=1;sk.eq=24;sv();if(first)note('SECRET UNLOCKED: THE MATRIX')}
   const L=lv,t=+lrt.toFixed(2),ok=runOK&&!LV[L].tor,pr=PAR[L],tier=!ok?0:t<=pr?3:t<=pr*1.6?2:t<=pr*2.6?1:0,prev=P.pb[L],nb=ok&&(!prev||t<prev);
   if(!P.name){let v=null;try{v=prompt('Name for the leaderboard?','PLAYER')}catch(e){}P.name=((v||'PLAYER')+'').trim().slice(0,12)||'PLAYER'}
   const xp=(P.cl[L]?50:150)+[0,30,80,150][tier]+(nb&&prev?50:0),ol=xpLv();let rank=0;
