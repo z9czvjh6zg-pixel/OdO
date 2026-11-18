@@ -227,7 +227,7 @@ function drawSRName(){
   cuBtn(R_NM[0],'OK',1);cuBtn(R_NM[1],'< BACK',0)}
 function startSR(){stopWin();srun=true;srT=0;A={d:1,a:0,p:0};deaths=0;total=0;state='play';load(0);for(const k of ['l','r','j','d','p','e'])K[k]=0;note('SPEEDRUN: all '+NL+' levels, no extras. Go!')}
 function endSR(){srun=false;load(Math.min(saved,NL-1))}
-function srNext(){if(lv+1<NL){const n=lv+1;load(n);note('Level '+(n+1)+' of '+NL+'   '+fmt(srT))}else srFinish()}
+function srNext(){if(MP.on&&(MP.one||lv+1>=NL)){mpFinish();return}if(lv+1<NL){const n=lv+1;load(n);note('Level '+(n+1)+' of '+NL+'   '+fmt(srT))}else srFinish()}
 function srFinish(){const t=+srT.toFixed(2);srun=false;
   if(badName(P.name))P.name='';guestName();
   const ls=P.lb.sr||(P.lb.sr=[]),en={n:P.name,t,at:Date.now()};ls.push(en);ls.sort((a,b)=>a.t-b.t);ls.length=Math.min(ls.length,10);
@@ -533,6 +533,7 @@ addEventListener('keydown',e=>{
   seqCheck(e);
   if((e.ctrlKey||e.metaKey)&&e.code==='KeyS'&&(state==='play'||state==='pause')){e.preventDefault();if(!e.repeat)saveGame('manual');return}
   if(menuKey(e))return;
+  if(state.startsWith('mp')){mpKey(e);return}
   if(state==='srname'){nameKey(e);return}
   if(state==='srhub'||state==='srwin'){srKey(e);return}
   if(state==='result'||state==='lb'){uiKey(e);return}
@@ -555,7 +556,7 @@ function btns(){const b=Math.min(innerWidth,innerHeight)*.17,m=b*.2,w=innerWidth
 function hitBtn(x,y){const B=btns();for(const k in B){const r=B[k];if(x>=r[0]&&x<=r[0]+r[2]&&y>=r[1]&&y<=r[1]+r[3])return k}return null}
 function touchSync(){const on={};for(const id in ptr)if(ptr[id])on[ptr[id]]=1;
   for(const k of ['l','r','j','d','p']){if(on[k]&&!K[k]&&hit[k]!==undefined)hit[k]=1;if(touch)K[k]=on[k]?1:0}}
-cv.addEventListener('pointerdown',e=>{window.focus();cv.focus();if(state==='custom'){cuDown=1;try{cv.setPointerCapture(e.pointerId)}catch(_){}cuTap(e);return}if(state==='shop'){shopTap(e);return}if(state==='result'||state==='lb'){uiTap(e);return}if(state==='menu'||state==='pause'){menuTap(e);return}if(state==='srname'){nameTap(e);return}if(state==='srhub'||state==='srwin'){srTap(e);return}if(state!=='play'){begin();return}{const gx=(e.clientX-ox)/S,gy=(e.clientY-oy)/S;if(gy<36&&gx>=40&&gx<70){restartCP();return}if(gx<40&&gy<36){openPause();return}if(LV[lv].tor&&touch&&gy>VH-46&&gx>VW/2-90&&gx<VW/2+90){const v=prompt('Say something...');if(v)torSay(v);return}}
+cv.addEventListener('pointerdown',e=>{window.focus();cv.focus();if(state==='custom'){cuDown=1;try{cv.setPointerCapture(e.pointerId)}catch(_){}cuTap(e);return}if(state==='shop'){shopTap(e);return}if(state.startsWith('mp')){mpTap(e);return}if(state==='result'||state==='lb'){uiTap(e);return}if(state==='menu'||state==='pause'){menuTap(e);return}if(state==='srname'){nameTap(e);return}if(state==='srhub'||state==='srwin'){srTap(e);return}if(state!=='play'){begin();return}{const gx=(e.clientX-ox)/S,gy=(e.clientY-oy)/S;if(gy<36&&gx>=40&&gx<70){restartCP();return}if(gx<40&&gy<36){openPause();return}if(LV[lv].tor&&touch&&gy>VH-46&&gx>VW/2-90&&gx<VW/2+90){const v=prompt('Say something...');if(v)torSay(v);return}}
   if(touch){ptr[e.pointerId]=hitBtn(e.clientX,e.clientY);touchSync()}});
 cv.addEventListener('pointermove',e=>{if(state==='custom'&&cuDown){cuDrag(e);return}if(touch&&ptr[e.pointerId]!==undefined){ptr[e.pointerId]=hitBtn(e.clientX,e.clientY);touchSync()}});
 const up=e=>{if(touch){delete ptr[e.pointerId];touchSync()}};
@@ -566,10 +567,10 @@ addEventListener('pointerup',()=>{cuDown=0;cuLast=null});addEventListener('point
 let mi=0,optOpen=false,night=0,dk=0,dunce=0,undies=0,nomx=0,cheatOpen=false,cbuf='',cmsg='',cmsgT=0,cheatList=false,cheatView=false,seqBuf=[];
 try{cheatList=+localStorage.getItem('sr2_cl')===1}catch(e){}
 try{night=+localStorage.getItem('sr2_night')||0;dk=(localStorage.getItem('sr2_dark')===null?1:(+localStorage.getItem('sr2_dark')||0));dunce=+localStorage.getItem('sr2_dunce')||0;undies=+localStorage.getItem('sr2_undies')||0;nomx=+localStorage.getItem('sr2_nomx')||0}catch(e){}
-const mItems=()=>state==='pause'?['RESUME','SAVE GAME','OPTIONS','HOME']:[hasSave()?'CONTINUE':'PLAY','SKINS','SPEEDRUN','DAILY CHALLENGE'].concat(hasSave()?['NEW GAME']:[]);
+const mItems=()=>state==='pause'?['RESUME','SAVE GAME','OPTIONS','HOME']:[hasSave()?'CONTINUE':'PLAY','SKINS','SPEEDRUN','DAILY CHALLENGE','MULTIPLAYER'].concat(hasSave()?['NEW GAME']:[]);
 const optItems=()=>['NIGHT LIGHT','DARK MODE'].concat(cheatList&&state==='pause'?['CHEAT CODES']:[],['SAVE CODE','BACK']),optN=()=>optItems().length;
 const CHEATS=[['drake sucks','Dunce hat, forever'],['levi','Warp to Levi\'s Trial'],['matrix','Matrix rain / skin'],['torture','Enter the Torture Room'],['score','Toggle boxer shorts'],['remove all','Remove all clothes']];
-const bR=i=>state==='menu'&&!optOpen?[VW/2-130,174+i*35,260,31]:optOpen&&optN()>=5?[VW/2-130,130+i*38,260,33]:[VW/2-130,140+i*46,260,38];
+const bR=i=>state==='menu'&&!optOpen?(mItems().length>5?[VW/2-130,171+i*31,260,28]:[VW/2-130,174+i*35,260,31]):optOpen&&optN()>=5?[VW/2-130,130+i*38,260,33]:[VW/2-130,140+i*46,260,38];
 function openPause(){if(LV[lv].tor)return;state='pause';saveGame('quiet');mi=0;optOpen=false;cheatView=false;for(const k of ['l','r','j','d','p'])K[k]=0}
 function pick(i){pulse[optOpen?optItems()[i]:mItems()[i]]=.18;
   if(optOpen){
@@ -584,9 +585,10 @@ function pick(i){pulse[optOpen?optItems()[i]:mItems()[i]]=.18;
   if(it==='RESUME')state='play';
   else if(it==='OPTIONS'){optOpen=true;mi=0}
   else if(it==='SAVE GAME')saveGame('manual');
-  else if(it==='HOME'){saveGame('quiet');if(srun)endSR();dailyMode=false;state='menu';mi=0}
+  else if(it==='HOME'){saveGame('quiet');if(MP.on||MP.peer)mpLeave();if(srun)endSR();dailyMode=false;state='menu';mi=0}
   else if(it==='SPEEDRUN')openSR();
   else if(it==='DAILY CHALLENGE')startDaily();
+  else if(it==='MULTIPLAYER'){MP.err='';state='mpmenu'}
   else if(it==='SKINS'){sel=selOf();state='shop'}
   else if(it==='NEW GAME')begin(1);
   else begin();
@@ -1177,7 +1179,7 @@ function startDaily(){
   {const r=dailyReq();note('DAILY: '+LV[i].n+'  |  Gold time '+r.par+'s'+(r.need?' + all '+r.need+' coins':'')+(r.emN?' + emerald':''))}
 }
 function finishLevel(){
-  if(srun){srNext();return}
+  if(srun){if(MP.on)mpLevelDone();srNext();return}
   if(dailyMode){
     {const r=dailyReq(),t=+lrt.toFixed(2),miss=[];
      if(!(runOK&&t<=r.par))miss.push('gold time '+r.par+'s (you: '+t.toFixed(1)+'s)');
@@ -1412,6 +1414,7 @@ function draw0(){
     if(LV[lv].tor)drawTor();if(lavaY<1e8){const lc=LV[lv].lc||['#ff5a1a','#ffd23d'];ctx.fillStyle=lc[0];ctx.fillRect(cx-2,lavaY,VW+4,2000);ctx.fillStyle=lc[1];ctx.fillRect(cx-2,lavaY,VW+4,5)}
     for(const q of parts){ctx.globalAlpha=clamp(q.l/q.m,0,1);ctx.fillStyle=q.c;if(q.h){ctx.font='bold 12px system-ui,sans-serif';ctx.textAlign='center';ctx.fillText('♥',q.x,q.y+4)}else ctx.fillRect(q.x-2,q.y-2,4,4)}
     ctx.globalAlpha=1;
+    mpDrawGhosts();
     if(p.dead<=0){
       if(p.gs<0){ctx.save();ctx.translate(0,2*(p.y+p.h/2));ctx.scale(1,-1)}
       const sq=p.pound?1.15:1;
@@ -1468,6 +1471,7 @@ function draw0(){
     tag(srun?('LVL '+(lv+1)+'/'+NL+'   RUN '+fmt(srT)+'   DEATHS '+deaths):(dailyMode&&lv===dLv?(()=>{const r=dailyReq();return 'GOLD '+lrt.toFixed(1)+'/'+r.par+'s   COINS '+r.got+'/'+r.need+(r.emN?'   EMERALD '+r.emG+'/'+r.emN:'')})():('COINS '+coins+'/'+TC+'   DEATHS '+deaths+'   LEVEL '+lrt.toFixed(2)+'s')),VW-8,22.5,13,(dailyMode&&lv===dLv&&lrt>PAR[dLv])?'#ff8a8a':'#cde','right')}
     {const ab=((A.d?'[2] Double Jump  ':'')+(A.a?'[D] Dash  ':'')+(A.p?'[P] Ground Pound':'')).trim();if(ab)tag(ab,8,VH-10,12,'#ffe14d','left')}
     if(emN()>0&&!srun)tag('EMERALDS '+emN()+'/'+EMD.length,VW-8,VH-10,12,'#5dffa8','right');
+    if(MP.on&&MP.started)mpHud();
     if(kc>0)tag('Key x'+kc,VW/2,VH-10,13,'#ffe14d','center');
     if(LV[lv].tor){if(tb)txt('> '+tb.slice(-16)+(Math.floor(performance.now()/400)%2?'_':''),VW/2,VH-14,15,'#ff9ab8','center');if(touch){ctx.strokeStyle='#ffffff77';ctx.lineWidth=1.5;rr(VW/2-80,VH-34,160,24,12);ctx.stroke();txt('SAY SOMETHING',VW/2,VH-17,12,'#fff','center')}}
     if(hintT>0&&msgT<=0)tag(LV[lv].t,VW/2,58,14,'#fff','center');
@@ -1480,6 +1484,10 @@ function draw0(){
   }else if(state==='srname'){drawSRName()
   }else if(state==='srhub'){drawSRHub()
   }else if(state==='srwin'){drawSRWin()
+  }else if(state==='mpmenu'){drawMPMenu()
+  }else if(state==='mpjoin'){drawMPJoin()
+  }else if(state==='mplobby'){drawMPLobby()
+  }else if(state==='mpwin'){drawMPWin()
   }else{
     ctx.fillStyle='#05081acc';ctx.fillRect(0,0,VW,VH);
     panel(VW/2-220,62,440,262,30,'rgba(14,20,44,.88)','#8af',22,2.5);ctx.shadowColor='#8af';ctx.shadowBlur=22;
@@ -1498,6 +1506,200 @@ function draw0(){
   }
 }
 
+/* ---------- multiplayer: host a game, friends type the 5 letter code on another PC ----------
+   Peer to peer (WebRTC) through the free PeerJS matchmaking server: needs internet, no server of your own.
+   Everyone races the same levels. You see the other players as see-through ghosts on the level you are on. */
+const MP_PRE='skyrunner-xmas-',MP_ALPHA='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const MP={on:0,host:0,peer:null,conns:{},myId:0,code:'',stat:'',err:'',pl:{},gh:{},lvl:0,one:0,started:0,first:{},done:{},buf:'',sendT:0,joinTm:0};
+const mpClean=v=>{v=String(v==null?'':v).replace(/[^\w \-]/g,'').trim().slice(0,12);return v&&!badName(v)?v:'PLAYER'};
+const mpNum=(v,a,b)=>{v=+v;return isFinite(v)?Math.max(a,Math.min(b,v)):a};
+function mpMyName(){guestName();return mpClean(P.name)}
+function mpClose(){clearTimeout(MP.joinTm);for(const id in MP.conns){try{MP.conns[id].close()}catch(e){}}MP.conns={};if(MP.peer){try{MP.peer.destroy()}catch(e){}MP.peer=null}}
+function mpRaceOff(){if(srun){srun=false;load(Math.min(saved,NL-1))}}
+function mpWipe(){MP.on=0;MP.host=0;MP.started=0;MP.pl={};MP.gh={};MP.first={};MP.done={};MP.stat='';MP.myId=0;MP.code=''}
+function mpLeave(msg,to){mpClose();mpWipe();MP.err=msg||'';mpRaceOff();stopWin();state=to||'menu'}
+function mpSend(m,except){for(const id in MP.conns){if(+id===except)continue;const c=MP.conns[id];if(c&&c.open){try{c.send(m)}catch(e){}}}}
+function mpEmit(m){if(MP.host)mpHostRecv(0,m);else mpSend(m)}
+function mpLoad(cb,fail){
+  if(window.Peer){cb();return}
+  const urls=['https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js','https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js'];let i=0;
+  const next=()=>{if(i>=urls.length){fail('Could not load the network library. Check your internet connection.');return}
+    const s=document.createElement('script');s.src=urls[i++];s.onload=()=>window.Peer?cb():next();s.onerror=next;document.head.appendChild(s)};
+  next()}
+function mpSt(d,id){return{t:'st',id,lv:mpNum(d.lv,0,NL-1)|0,x:mpNum(d.x,-1e5,1e6),y:mpNum(d.y,-1e5,1e6),f:+d.f<0?-1:1,d:d.d?1:0,s:mpNum(d.s,0,SK.length-1)|0}}
+function mpGhost(m){const g=MP.gh[m.id]||(MP.gh[m.id]={});if(g.dx===undefined||g.dl!==m.lv){g.dx=m.x;g.dy=m.y;g.dl=m.lv}g.lv=m.lv;g.x=m.x;g.y=m.y;g.f=m.f;g.d=m.d;g.s=m.s}
+/* --- host --- */
+function mpHost(){
+  mpClose();mpWipe();MP.host=1;MP.err='';MP.stat='Creating game...';state='mplobby';
+  mpLoad(()=>mpTryCode(0),m=>mpLeave(m,'mpmenu'))}
+function mpTryCode(n){
+  if(n>6){mpLeave('Could not create a game. Try again.','mpmenu');return}
+  let code='';for(let i=0;i<5;i++)code+=MP_ALPHA[Math.floor(Math.random()*MP_ALPHA.length)];
+  let pr;try{pr=new Peer(MP_PRE+code)}catch(e){mpLeave('Network error. Try again.','mpmenu');return}
+  MP.peer=pr;
+  pr.on('open',()=>{if(MP.peer!==pr)return;MP.code=code;MP.on=1;MP.stat='';MP.myId=0;MP.pl[0]={n:mpMyName(),s:SKN().id}});
+  pr.on('connection',c=>{if(MP.peer===pr)mpHostConn(c)});
+  pr.on('error',er=>{if(MP.peer!==pr)return;if(er&&er.type==='unavailable-id'){try{pr.destroy()}catch(e){}MP.peer=null;mpTryCode(n+1)}else if(!MP.on)mpLeave('Network error ('+(er&&er.type)+'). Check your internet.','mpmenu')});
+  pr.on('disconnected',()=>{if(MP.peer===pr&&!pr.destroyed){try{pr.reconnect()}catch(e){}}})}
+function mpHostConn(c){
+  let id=-1;
+  c.on('open',()=>{
+    if(MP.started||Object.keys(MP.conns).length>=7){try{c.send({t:'full',why:MP.started?'That game already started.':'That game is full.'})}catch(e){}setTimeout(()=>{try{c.close()}catch(e){}},400);return}
+    id=1;while(MP.conns[id])id++;
+    MP.conns[id]=c;MP.pl[id]={n:'PLAYER',s:0};
+    try{c.send({t:'welcome',id})}catch(e){}
+    mpRoster()});
+  c.on('data',d=>{if(id>0&&d&&typeof d==='object')mpHostRecv(id,d)});
+  const gone=()=>{if(id>0&&MP.conns[id]===c)mpDrop(id)};
+  c.on('close',gone);c.on('error',gone)}
+const mpRoster=()=>mpSend({t:'roster',pl:MP.pl});
+function mpHostEvent(m){note(m);mpSend({t:'ev',m})}
+function mpDrop(id){const n=MP.pl[id]&&MP.pl[id].n;delete MP.conns[id];delete MP.pl[id];delete MP.gh[id];delete MP.done[id];mpRoster();if(MP.started)mpHostEvent((n||'A player')+' left')}
+function mpHostRecv(id,d){
+  const me=MP.pl[id];if(!me)return;
+  if(d.t==='hi'){me.n=mpClean(d.n);me.s=mpNum(d.s,0,SK.length-1)|0;mpRoster()}
+  else if(d.t==='st'){const m=mpSt(d,id);if(id!==0)mpGhost(m);mpSend(m,id)}
+  else if(d.t==='fin'){const L=mpNum(d.lv,0,NL-1)|0;if(!MP.first[L]){MP.first[L]=1;if(!MP.one&&L+1<NL)mpHostEvent(me.n+' cleared level '+(L+1)+' first!')}}
+  else if(d.t==='done'&&MP.done[id]==null){const t=mpNum(d.tm,0,1e6);MP.done[id]=t;mpSend({t:'done',id,tm:t});mpHostEvent(me.n+' finished in '+fmt(t))}}
+/* --- client --- */
+function mpJoin(code){
+  code=String(code||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if(code.length!==5){MP.err='The game code is 5 letters or numbers.';return}
+  mpClose();mpWipe();MP.err='';MP.stat='Connecting...';
+  mpLoad(()=>{
+    let pr;try{pr=new Peer()}catch(e){mpJoinFail('Network error. Try again.');return}
+    MP.peer=pr;
+    pr.on('error',er=>{if(MP.peer!==pr||MP.on)return;mpJoinFail(er&&er.type==='peer-unavailable'?'No game found with that code.':'Network error ('+(er&&er.type)+').')});
+    pr.on('open',()=>{
+      if(MP.peer!==pr)return;
+      const c=pr.connect(MP_PRE+code,{reliable:true,serialization:'json'});
+      MP.joinTm=setTimeout(()=>{if(!MP.on&&MP.peer===pr)mpJoinFail('Could not connect. Check the code and your internet.')},15000);
+      c.on('open',()=>{if(MP.peer!==pr)return;clearTimeout(MP.joinTm);MP.conns[0]=c;MP.on=1;MP.code=code;MP.stat='';MP.err='';state='mplobby';
+        try{c.send({t:'hi',n:mpMyName(),s:SKN().id})}catch(e){}});
+      c.on('data',d=>{if(d&&typeof d==='object')mpClientRecv(d)});
+      const gone=()=>{if(MP.peer===pr&&MP.conns[0]===c&&MP.on)mpLeave('The host left the game.','mpmenu')};
+      c.on('close',gone);c.on('error',gone)})},
+    m=>mpJoinFail(m))}
+function mpJoinFail(m){mpClose();MP.on=0;MP.stat='';MP.err=m;state='mpjoin'}
+function mpClientRecv(d){
+  if(d.t==='welcome')MP.myId=mpNum(d.id,0,99)|0;
+  else if(d.t==='full')mpLeave(String(d.why||'Could not join.').slice(0,60),'mpjoin');
+  else if(d.t==='roster'&&d.pl&&typeof d.pl==='object'){const pl={};for(const k in d.pl){const q=d.pl[k]||{};pl[k]={n:mpClean(q.n),s:mpNum(q.s,0,SK.length-1)|0}}MP.pl=pl;for(const k in MP.gh)if(!pl[k])delete MP.gh[k]}
+  else if(d.t==='st'){if(+d.id!==MP.myId)mpGhost(mpSt(d,+d.id))}
+  else if(d.t==='go')mpBegin(mpNum(d.lv,0,NL-1)|0,d.one?1:0);
+  else if(d.t==='ev')note(String(d.m).slice(0,70));
+  else if(d.t==='done')MP.done[+d.id]=mpNum(d.tm,0,1e6);
+  else if(d.t==='lobby')mpLobbyLocal()}
+/* --- race flow --- */
+function mpGo(){if(!MP.host||!MP.on||MP.started)return;MP.lvl=clamp(MP.lvl,0,NL-1);mpSend({t:'go',lv:MP.lvl,one:MP.one});mpBegin(MP.lvl,MP.one)}
+function mpBegin(L,one){stopWin();MP.started=1;MP.one=one;MP.done={};MP.first={};MP.gh={};MP.sendT=0;srun=true;srT=0;A={d:1,a:0,p:0};deaths=0;total=0;state='play';load(L);for(const k of ['l','r','j','d','p','e'])K[k]=0;note('GO!  '+(one?'First to clear this level wins':'Race to the end'))}
+function mpLevelDone(){mpEmit({t:'fin',lv})}
+function mpFinish(){const t=+srT.toFixed(2);if(!MP.host)MP.done[MP.myId]=t;mpEmit({t:'done',tm:t});for(const k of ['l','r','j','d','p','e'])K[k]=0;state='mpwin'}
+function mpLobbyLocal(){mpRaceOff();MP.started=0;MP.done={};MP.first={};MP.gh={};state='mplobby'}
+function mpLobbyHost(){if(!MP.host)return;mpSend({t:'lobby'});mpLobbyLocal()}
+function mpTick(dt){
+  if(!MP.on)return;
+  for(const id in MP.gh){const g=MP.gh[id];if(g.dx===undefined)continue;const k=Math.min(1,dt*14);g.dx+=(g.x-g.dx)*k;g.dy+=(g.y-g.dy)*k}
+  if(MP.started&&state==='play'&&p&&(MP.sendT-=dt)<=0){MP.sendT=.066;mpEmit({t:'st',lv,x:Math.round(p.x),y:Math.round(p.y),f:p.face,d:p.dead>0?1:0,s:SKN().id})}}
+/* --- drawing other players inside the level, and the corner list --- */
+function mpDrawGhosts(){
+  if(!MP.on||!MP.started)return;
+  for(const id in MP.gh){const g=MP.gh[id];if(g.dx===undefined||g.lv!==lv)continue;
+    const s=SK[g.s]||SK[0],x=g.dx,y=g.dy,q=MP.pl[id];
+    ctx.save();ctx.globalAlpha=g.d?.25:.7;
+    if(s.levi)drawLevi(x,y,22,28,g.f,0,1);else if(s.pix)drawPix(x,y,22,28,g.f,0);else if(s.img)drawSkinImg(x,y,22,28,g.f,0);else if(s.santa)drawSanta(x,y,22,28,g.f,0);
+    else{ctx.fillStyle=s.ult||s.rb?'hsl('+(time*200%360)+',90%,60%)':s.gold?'#ffd23d':s.love?'#ff3d7a':s.c;ctx.fillRect(x,y,22,28);ctx.fillStyle=s.a;ctx.fillRect(x+(g.f>0?13:3),y+7,6,6)}
+    ctx.globalAlpha=1;
+    if(q){const ty=(s.levi?y+28-28*LEVI_SCALE:y)-6;try{ctx.letterSpacing='0px'}catch(e){}ctx.font='bold 10px system-ui,sans-serif';ctx.textAlign='center';ctx.lineWidth=3;ctx.strokeStyle='#000';ctx.strokeText(q.n,x+11,ty);ctx.fillStyle='#fff';ctx.fillText(q.n,x+11,ty)}
+    ctx.restore()}}
+function mpHud(){
+  let y=46;tag('ROOM '+MP.code,VW-8,y,11,'#9fe9ff','right');
+  for(const id in MP.pl){if(+id===MP.myId)continue;y+=20;const q=MP.pl[id],g=MP.gh[id],dn=MP.done[id];
+    tag(q.n+'  '+(dn!=null?'FINISHED '+fmt(dn):g?'LVL '+(g.lv+1):'...'),VW-8,y,11,dn!=null?'#5dff8a':g&&g.lv===lv?'#ffe14d':'#fff','right')}}
+/* --- screens --- */
+const R_MPM=[[VW/2-110,142,220,38],[VW/2-110,188,220,38],[VW/2-110,234,220,32],[VW/2-110,276,220,32]];
+const R_MPJ=[[VW/2-160,266,150,34],[VW/2+10,266,150,34]];
+const R_MPL={lv0:[330,146,32,28],lv1:[538,146,32,28],mode:[330,184,240,30],start:[330,226,240,40],leave:[VW/2-60,318,120,32]};
+const R_MPW=[[VW/2-165,306,160,32],[VW/2+5,306,160,32]],R_MPWc=[VW/2-80,306,160,32];
+function mpBg(){ctx.fillStyle='#05081add';ctx.fillRect(0,0,VW,VH)}
+function drawMPMenu(){
+  mpBg();panel(110,46,420,300,28,'rgba(14,20,44,.94)','#9fe9ff',22,2.5);
+  txt('MULTIPLAYER',VW/2,92,26,'#9fe9ff','center',1);
+  txt('Host makes a game and gets a code. Friends type it on their PC.',VW/2,114,11,'#cde','center');
+  txt('Needs internet. Up to 8 players.',VW/2,130,11,'#9ab','center');
+  cuBtn(R_MPM[0],'HOST A GAME',1);cuBtn(R_MPM[1],'JOIN A GAME',0);cuBtn(R_MPM[2],'NAME: '+mpMyName(),0);cuBtn(R_MPM[3],'< BACK',0);
+  if(MP.err)txt(MP.err,VW/2,332,13,'#ff8a8a','center')}
+function drawMPJoin(){
+  mpBg();panel(110,60,420,260,28,'rgba(14,20,44,.94)','#9fe9ff',22,2.5);
+  txt('ENTER GAME CODE',VW/2,108,24,'#9fe9ff','center',1);
+  txt('Type the 5 letter code from the host. Press ENTER to join.',VW/2,134,12,'#cde','center');
+  rr(190,160,260,54,12);ctx.fillStyle='rgba(255,255,255,.08)';ctx.fill();
+  txt(MP.buf+(Math.floor(performance.now()/450)%2?'_':' '),VW/2,201,32,'#ffe14d','center',1);
+  if(MP.stat)txt(MP.stat,VW/2,242,14,'#9fe9ff','center');else if(MP.err)txt(MP.err,VW/2,242,13,'#ff8a8a','center');
+  cuBtn(R_MPJ[0],'JOIN',1);cuBtn(R_MPJ[1],'< BACK',0)}
+function drawMPLobby(){
+  mpBg();panel(60,24,520,336,28,'rgba(14,20,44,.94)','#9fe9ff',22,2.5);
+  txt('MULTIPLAYER LOBBY',VW/2,58,20,'#9fe9ff','center',1);
+  if(MP.stat||!MP.code)txt(MP.stat||'Please wait...',VW/2,108,18,'#cde','center');
+  else{txt('GAME CODE',VW/2,80,11,'#9ab','center');txt(MP.code,VW/2,120,42,'#ffe14d','center',1)}
+  const ids=Object.keys(MP.pl).sort((a,b)=>a-b);
+  txt('PLAYERS ('+ids.length+')',90,148,13,'#9fe9ff','left',1);
+  ids.slice(0,8).forEach((id,i)=>{const q=MP.pl[id],s=SK[q.s]||SK[0],y=168+i*17;
+    ctx.fillStyle=s.ult||s.rb?'#fff':s.c;ctx.fillRect(90,y-9,9,11);ctx.strokeStyle='#ffffff55';ctx.lineWidth=1;ctx.strokeRect(90,y-9,9,11);
+    txt(q.n+(+id===0?'  (HOST)':'')+(+id===MP.myId?'  (YOU)':''),108,y,13,+id===MP.myId?'#5dff8a':'#fff','left')});
+  if(MP.host&&MP.on){
+    cuBtn(R_MPL.lv0,'<',0);cuBtn(R_MPL.lv1,'>',0);
+    txt(LV[MP.lvl].n,450,166,14,'#fff','center');
+    cuBtn(R_MPL.mode,MP.one?'MODE: ONE LEVEL':'MODE: ALL LEVELS',0);
+    cuBtn(R_MPL.start,'START RACE',1);
+    txt('Pick the starting level. Arrows, M, ENTER also work.',450,288,10,'#9ab','center')}
+  else if(MP.on)txt('Waiting for the host to start...',450,200,15,'#cde','center');
+  cuBtn(R_MPL.leave,'LEAVE',0)}
+function drawMPWin(){
+  mpBg();panel(110,36,420,312,28,'rgba(14,20,44,.94)','#8af',22,2.5);
+  txt('RACE RESULTS',VW/2,80,26,'#8af','center',1);
+  const ids=Object.keys(MP.pl),fin=ids.filter(i=>MP.done[i]!=null).sort((a,b)=>MP.done[a]-MP.done[b]),rest=ids.filter(i=>MP.done[i]==null);
+  fin.concat(rest).slice(0,8).forEach((id,i)=>{const q=MP.pl[id],y=114+i*21,d=MP.done[id],me=+id===MP.myId,c=me?'#5dff8a':'#fff';
+    txt(d!=null?(i+1)+'.':'-',140,y,15,'#ffd23d','left');
+    txt(q.n+(me?'  (YOU)':''),172,y,15,c,'left');
+    txt(d!=null?fmt(d):('racing  LVL '+(MP.gh[id]?MP.gh[id].lv+1:'?')),500,y,14,d!=null?c:'#9ab','right')});
+  if(MP.host){cuBtn(R_MPW[0],'LOBBY',1);cuBtn(R_MPW[1],'LEAVE',0)}
+  else{txt('Waiting for the host to pick the next round',VW/2,290,11,'#9ab','center');cuBtn(R_MPWc,'LEAVE',0)}}
+/* --- input --- */
+function mpRename(){let v=null;try{v=prompt('Your name (max 12 chars)',mpMyName())}catch(e){}if(v==null)return;const raw=String(v),c=raw.replace(/[^\w \-]/g,'').trim().slice(0,12);if(c&&!badName(raw)&&!badName(c)){P.name=c;psv();MP.err=''}else MP.err='That name is not allowed.'}
+function mpAskCode(){let v=null;try{v=prompt('Game code (5 letters or numbers)','')}catch(e){}return v?String(v).toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,5):''}
+function mpKey(e){
+  const c=e.code;
+  if(state==='mpmenu'){if(c==='Escape'||c==='Backspace')state='menu';else if(c==='KeyH')mpHost();else if(c==='KeyJ'){MP.buf='';MP.err='';state='mpjoin'}}
+  else if(state==='mpjoin'){
+    if(c==='Escape'){mpClose();MP.stat='';state='mpmenu'}
+    else if(c==='Enter'){if(!MP.stat)mpJoin(MP.buf)}
+    else if(c==='Backspace')MP.buf=MP.buf.slice(0,-1);
+    else if(e.key&&e.key.length===1&&!e.ctrlKey&&!e.metaKey&&/[A-Za-z0-9]/.test(e.key)&&MP.buf.length<5)MP.buf+=e.key.toUpperCase()}
+  else if(state==='mplobby'){
+    if(c==='Escape')mpLeave(null,'mpmenu');
+    else if(MP.host&&MP.on){if(c==='ArrowLeft')MP.lvl=(MP.lvl+NL-1)%NL;else if(c==='ArrowRight')MP.lvl=(MP.lvl+1)%NL;else if(c==='KeyM')MP.one^=1;else if(c==='Enter'||c==='Space')mpGo()}}
+  else if(state==='mpwin'){if(c==='Escape')mpLeave(null,'mpmenu');else if((c==='Enter'||c==='Space')&&MP.host)mpLobbyHost()}
+  if(c==='Escape'||c==='Backspace'||c==='Space'||c==='Enter'||c.startsWith('Arrow'))e.preventDefault()}
+function mpTap(e){
+  const x=(e.clientX-ox)/S,y=(e.clientY-oy)/S;
+  if(state==='mpmenu'){
+    if(inR(x,y,R_MPM[0]))mpHost();
+    else if(inR(x,y,R_MPM[1])){MP.buf='';MP.err='';state='mpjoin';if(touch){MP.buf=mpAskCode();if(MP.buf.length===5)mpJoin(MP.buf)}}
+    else if(inR(x,y,R_MPM[2]))mpRename();
+    else if(inR(x,y,R_MPM[3]))state='menu'}
+  else if(state==='mpjoin'){
+    if(inR(x,y,R_MPJ[0])){if(MP.stat)return;if(MP.buf.length<5&&touch)MP.buf=mpAskCode();mpJoin(MP.buf)}
+    else if(inR(x,y,R_MPJ[1])){mpClose();MP.stat='';state='mpmenu'}}
+  else if(state==='mplobby'){
+    if(inR(x,y,R_MPL.leave))mpLeave(null,'mpmenu');
+    else if(MP.host&&MP.on){
+      if(inR(x,y,R_MPL.lv0))MP.lvl=(MP.lvl+NL-1)%NL;else if(inR(x,y,R_MPL.lv1))MP.lvl=(MP.lvl+1)%NL;
+      else if(inR(x,y,R_MPL.mode))MP.one^=1;else if(inR(x,y,R_MPL.start))mpGo()}}
+  else if(state==='mpwin'){
+    if(MP.host){if(inR(x,y,R_MPW[0]))mpLobbyHost();else if(inR(x,y,R_MPW[1]))mpLeave(null,'mpmenu')}
+    else if(inR(x,y,R_MPWc))mpLeave(null,'mpmenu')}}
+
 /* ---------- loop ---------- */
 let last=performance.now();
 addEventListener('wheel',e=>{if(state==='shop'){sel=clamp(sel+(e.deltaY>0?1:-1),0,nSK()-1);e.preventDefault()}},{passive:false});
@@ -1508,7 +1710,7 @@ cv.addEventListener('pointermove',e=>{if(e.pointerType==='touch'||!(state==='men
 function loop(t){
   const dt=Math.min(.033,(t-last)/1000);last=t;uiDt=dt;for(const k in pulse)if((pulse[k]-=dt)<=0)delete pulse[k];
   if(state==='play')update(dt);else time+=dt;
-  xmHook();draw();requestAnimationFrame(loop);
+  mpTick(dt);xmHook();draw();requestAnimationFrame(loop);
 }
 load(0);requestAnimationFrame(loop);
 </script>
