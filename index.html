@@ -996,7 +996,7 @@ function drawReindeer(x,y,ph,rudolph){
 function drawHoHo(){
   if(state!=='menu')return;
   const dt=uiDt;SL.cd-=dt;
-  if(!SL.on&&SL.cd<=0){SL.on=1;SL.cd=6;SL.real=0;SL.sp=SL.buf?160:205;SL.x=-235;SL.y=48+Math.random()*34;SL.age=0;SL.vs=-1;SL.drift=Math.random()*6}
+  if(!SL.on&&SL.cd<=0){SL.on=1;SL.cd=6;SL.real=0;SL.sp=SL.buf?160:205;SL.x=-235;SL.y=100+Math.random()*20;SL.age=0;SL.vs=-1;SL.drift=Math.random()*6}
   if(!SL.on)return;
   SL.age+=dt;SL.x+=SL.sp*dt;
   if(SL.vs<0&&SL.x>=(SL.buf?-150:-30)){SL.vs=SL.age;slHo()}
